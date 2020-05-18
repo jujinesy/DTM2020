@@ -29,6 +29,8 @@ using System.Text;
 using UnityEngine;
 using UnityEngine.UI;
 using LitJson; // TODO: [LitJson] `LitJson.dll` 필요
+using UnityEngine.SceneManagement;
+using System.ComponentModel.Design.Serialization;
 
 /*********************************************************
  * 데이터 클래스 인터페이스
@@ -69,10 +71,18 @@ public class WebLogin : IWebData
         
         if(JsonObject["ResultMsg"].ToString() == "1")
         {
-            NetWWW.INSTANCE().ChangeLoginPanel(JsonObject["User_name"].ToString()+"님 안녕하세요!");
+            GameManager.Instance.islogin = true;
+            GameManager.Instance.user_email = JsonObject["User_email"].ToString();
+            GameManager.Instance.user_name = JsonObject["User_name"].ToString();
+            GameManager.Instance.user_level = JsonObject["User_level"].ToString();
+            GameManager.Instance.user_org = JsonObject["User_org"].ToString();
+            GameManager.Instance.user_org_pos = JsonObject["User_org_pos"].ToString();
+
+            GameObject.Find("LogInDirection2").GetComponent<Text>().text = GameManager.Instance.user_name + "님 안녕하세요!";
+            SceneManager.LoadScene("CuratorMode");
         } else
         {
-            NetWWW.INSTANCE().ChangeLoginPanel("로그인 실패");
+            GameObject.Find("LogInDirection2").GetComponent<Text>().text = "로그인 실패";
         }
 
     }
@@ -82,13 +92,25 @@ public class WebRegister : IWebData
 {
     public string id { get; set; }
     public string password { get; set; }
+    public string name { get; set; }
+    public string org { get; set; }
+    public string orgpos { get; set; }
 
-    public string URL() { return "Register.php"; }
+    public string URL() { return "Register2.php"; }
 
     public void Recv(JsonData JsonObject)
     {
-        NetWWW.INSTANCE().MessageBox("Register Success");
+        //NetWWW.INSTANCE().MessageBox("Register Success");
         Debug.Log("Register Success");
+
+        if (JsonObject["ResultCode2"].ToString() == "1")
+        {
+            GameObject.Find("SignUpErr").GetComponent<Text>().text = "회원가입 완료!";
+        }
+        else
+        {
+            GameObject.Find("SignUpErr").GetComponent<Text>().text = "중복된 이메일이 있습니다.";
+        }
     }
 }
 
@@ -171,9 +193,17 @@ public class NetWWW : MonoBehaviour
     // 접근 지정자 public.  Unity의 inspector에서 제어 가능
     public string id;
     public string password;
-    public Text idText;
-    public InputField pwText;
-    public Text myText;
+
+    public Text loginIdText;
+    public InputField loginPwText;
+
+    public Text signupIdText;
+    public InputField signupPwText;
+    public InputField signupPwconText;
+    public Text signupNameText;
+    public Text signupOrgText;
+    public Text signupOrgposText;
+
 
     public string session { get; set; }
     public int accountno { get; set; }
@@ -470,20 +500,33 @@ public class NetWWW : MonoBehaviour
         }
     }
 
-    public void ChangeLoginPanel(string Message)
-    {
-        //INSTANCE()._szMsg = Message;
-        //INSTANCE()._bMsgbox = true;
-        myText.GetComponent<Text>().text = Message;
-    }
-
     public void ClickLogin()
     {
         WebLogin Login = new WebLogin();
 
-        Login.id = idText.GetComponent<Text>().text;
-        Login.password = pwText.text;
+        Login.id = loginIdText.GetComponent<Text>().text;
+        Login.password = loginPwText.text;
 
         NetWWW.INSTANCE().Send(Login, true);
+    }
+
+    public void ClickSignup()
+    {
+        WebRegister Reg = new WebRegister();
+
+        Reg.id = signupIdText.GetComponent<Text>().text;
+        Reg.password = signupPwText.text;
+        Reg.name = signupNameText.GetComponent<Text>().text;
+        Reg.org = signupOrgText.GetComponent<Text>().text;
+        Reg.orgpos = signupOrgposText.GetComponent<Text>().text;
+
+        if(Reg.password.Equals(signupPwconText.text))
+        {
+            NetWWW.INSTANCE().Send(Reg, true);
+        } else
+        {
+            GameObject.Find("SignUpErr").GetComponent<Text>().text = "비밀번호가 일치하지 않습니다.";
+        }
+        
     }
 }
