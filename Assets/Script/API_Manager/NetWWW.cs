@@ -78,9 +78,28 @@ public class WebLogin : IWebData
             GameManager.Instance.user_org = JsonObject["User_org"].ToString();
             GameManager.Instance.user_org_pos = JsonObject["User_org_pos"].ToString();
 
+
+            NetWWW.INSTANCE().UserLoadList(GameManager.Instance.user_email);
+
+
+
             GameObject.Find("LogInDirection2").GetComponent<Text>().text = GameManager.Instance.user_name + "님 안녕하세요!";
-            SceneManager.LoadScene("CuratorMode");
-        } else
+
+            GameObject.Find("menuUI").transform.FindChild("myCurationPanel/LoginRequest").gameObject.SetActive(false);
+
+            GameObject.Find("menuUI").transform.FindChild("myCurationPanel/MyCurationDirection").gameObject.SetActive(true);
+            GameObject.Find("menuUI").transform.FindChild("myCurationPanel/create_btn").gameObject.SetActive(true);
+            GameObject.Find("menuUI").transform.FindChild("myCurationPanel/Scroll View").gameObject.SetActive(true);
+
+
+            //PanelManager pm = new PanelManager();
+            //pm.OpenMyCurationPanel();
+            GameObject.Find("menuUI").transform.FindChild("UpperMenuPanel").gameObject.GetComponent<PanelManager>().OpenMyCurationPanel();
+
+            //GameObject.Find("menuUI").transform.FindChild("myCurationPanel/VerticalScrollbar").gameObject.SetActive(true);
+            //SceneManager.LoadScene("CuratorMode");
+        }
+        else
         {
             GameObject.Find("LogInDirection2").GetComponent<Text>().text = "로그인 실패";
         }
@@ -111,6 +130,84 @@ public class WebRegister : IWebData
         {
             GameObject.Find("SignUpErr").GetComponent<Text>().text = "중복된 이메일이 있습니다.";
         }
+    }
+}
+
+public class WebUserSave : IWebData
+{
+    public string user_email { get; set; }
+    public string user_title { get; set; }
+    public string obj_info { get; set; }
+    public string img_info { get; set; }
+
+    public string URL() { return "UserSave.php"; }
+
+    public void Recv(JsonData JsonObject)
+    {
+        //NetWWW.INSTANCE().MessageBox("Register Success");
+        Debug.Log("UserSave Success");
+
+    }
+}
+
+public class WebUserLoad : IWebData
+{
+    public string user_email { get; set; }
+    public string obj_info { get; set; }
+    public string img_info { get; set; }
+
+    public string URL() { return "UserLoad.php"; }
+
+    public void Recv(JsonData JsonObject)
+    {
+        //NetWWW.INSTANCE().MessageBox("Register Success");
+        Debug.Log("UserLoad Success");
+
+        GameManager.Instance.obj_info = JsonObject["Obj_info"].ToString();
+        GameManager.Instance.img_info = JsonObject["Img_info"].ToString();
+
+    }
+}
+
+public class WebUserLoadList : IWebData
+{
+    public string user_email { get; set; }
+    public string obj_info { get; set; }
+    public string img_info { get; set; }
+
+    public string URL() { return "UserLoadList.php"; }
+
+    public void Recv(JsonData JsonObject)
+    {
+        //NetWWW.INSTANCE().MessageBox("Register Success");
+        Debug.Log("UserLoadList Success");
+
+
+
+        GameManager.Instance.loadData.Clear();
+        for (int i = 0; i < JsonObject["Arry"].Count; i++)
+        {
+            //Debug.Log(JsonObject["Arry"][i]["idx"].ToString());
+            LoadData tloaddata = new LoadData();
+            tloaddata.idx = JsonObject["Arry"][i]["idx"].ToString();
+            tloaddata.save_title = JsonObject["Arry"][i]["save_title"].ToString();
+            tloaddata.obj_info = JsonObject["Arry"][i]["obj_info"].ToString();
+            tloaddata.img_info = JsonObject["Arry"][i]["img_info"].ToString();
+            tloaddata.create_time = JsonObject["Arry"][i]["create_time"].ToString();
+            GameManager.Instance.loadData.Add(tloaddata);
+        }
+
+        //Debug.Log(JsonObject["Arry"].Count);
+        //LoadDataList loadlist = JsonUtility.FromJson<LoadDataList>(""" """);
+        //LoadDataList loadlist = JsonObject["Arry"];
+        //GameManager.Instance.loadData = loadlist.list;
+
+        //GameManager.Instance.loadData = JsonObject["Obj_info"].ToString();
+        //GameManager.Instance.img_info = JsonObject["Img_info"].ToString();
+
+
+        GameObject.Find("menuUI").transform.FindChild("myCurationPanel").gameObject.transform.FindChild("Scroll View").gameObject.GetComponent<SVManager>().gensv();
+
     }
 }
 
@@ -237,7 +334,7 @@ public class NetWWW : MonoBehaviour
     {
         // TODO: [Unity Script] DontDestroyOnLoad(this);
         // 해당 스크립트가 있는 오브젝트는 씬이 바뀌어도 파괴되지 않음
-        DontDestroyOnLoad(this);
+        //DontDestroyOnLoad(this);
 
         PlayerPrefs.SetString("Id", "한글1"); // 자동 로그인을 위한 Key Value를 유니티에 저장
         id = PlayerPrefs.GetString("Id");   // 반드시 로그인마다 세션 갱신
@@ -527,6 +624,38 @@ public class NetWWW : MonoBehaviour
         {
             GameObject.Find("SignUpErr").GetComponent<Text>().text = "비밀번호가 일치하지 않습니다.";
         }
-        
+    }
+
+    public void UserSave(string user_email, string user_title, string obj_info, string img_info)
+    {
+        WebUserSave Save = new WebUserSave();
+        Save.user_email = user_email;
+        Save.user_title = user_title;
+        Save.obj_info = obj_info;
+        Save.img_info = img_info;
+
+        NetWWW.INSTANCE().Send(Save, true);
+
+        Debug.Log("test save");
+    }
+
+    public void UserLoad(string user_email)
+    {
+        WebUserLoad Load = new WebUserLoad();
+        Load.user_email = user_email;
+        //Load.obj_info = "1";
+        //Load.img_info = "1";
+
+        NetWWW.INSTANCE().Send(Load, true);
+    }
+
+    public void UserLoadList(string user_email)
+    {
+        WebUserLoadList LoadList = new WebUserLoadList();
+        LoadList.user_email = user_email;
+        //Load.obj_info = "1";
+        //Load.img_info = "1";
+
+        NetWWW.INSTANCE().Send(LoadList, true);
     }
 }

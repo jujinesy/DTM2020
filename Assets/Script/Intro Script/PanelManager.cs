@@ -21,9 +21,6 @@ public class PanelManager : MonoBehaviour
             LogInPanel.SetActive(false);
             SignUpPanel.SetActive(false);
             MyCurationPanel.SetActive(false);
-
-
-
         }
     }
 
@@ -36,7 +33,6 @@ public class PanelManager : MonoBehaviour
             InfoPanel.SetActive(false);
             SignUpPanel.SetActive(false);
             MyCurationPanel.SetActive(false);
-
         }
     }
     public void OpenSignUpPanel()
@@ -48,7 +44,6 @@ public class PanelManager : MonoBehaviour
             InfoPanel.SetActive(false);
             LogInPanel.SetActive(false);
             MyCurationPanel.SetActive(false);
-
         }
     }
 
@@ -61,8 +56,6 @@ public class PanelManager : MonoBehaviour
             InfoPanel.SetActive(false);
             LogInPanel.SetActive(false);
             SignUpPanel.SetActive(false);
-
         }
     }
-
 }

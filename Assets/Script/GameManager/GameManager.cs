@@ -39,11 +39,18 @@ public class GameManager : MonoBehaviour
     }
 
     public bool islogin = false;
+    public bool isload = false;
     public string user_email;
     public string user_name;
     public string user_level;
     public string user_org;
     public string user_org_pos;
+
+    public string obj_info;
+    public string img_info;
+
+    public List<LoadData> loadData = new List<LoadData>();
+    public List<GameObject> btnload = new List<GameObject>();
 
     // Start is called before the first frame update
     void Start()

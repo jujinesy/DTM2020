@@ -30,7 +30,7 @@ public class LowerMenuSlotManager : MonoBehaviour
 
 
     [SerializeField]
-    private Craft[] architecture_button;
+    private Craft[] spaceDesign_button;
     [SerializeField]
     private Craft[] landscape_button;
     [SerializeField]
@@ -81,7 +81,7 @@ public class LowerMenuSlotManager : MonoBehaviour
 
         tabNumber = 0;
         page = 1;
-        TabSlotSetting(architecture_button); //기본화면 artwork화면으로
+        TabSlotSetting(spaceDesign_button); //기본화면 artwork화면으로
     }
 
     public void TabSetting(int _tabNumber)
@@ -93,7 +93,7 @@ public class LowerMenuSlotManager : MonoBehaviour
         {
             case 0:
 
-                TabSlotSetting(architecture_button);
+                TabSlotSetting(spaceDesign_button);
                 break; //아트워크 세팅
 
             case 1:
@@ -199,6 +199,7 @@ public class LowerMenuSlotManager : MonoBehaviour
 
         go_Preview = Instantiate(craft_SelectedTab[selectedSlotNumber].go_PreviewPrefab, tf_Player.position + tf_Player.forward, Quaternion.identity); //craft_fire 탭에 있는 슬롯 넘버 배열을 생성, 시선에 따라 prefab도 플레이어의 위치에 따라 플레이어의 시야 앞에서 움직임, 회전값(Quaternion)은 identity에 따라 적용
         go_Prefab = craft_SelectedTab[selectedSlotNumber].go_Prefab;
+        go_Prefab.tag = "Newobjs";
 
         isPreviewActivated = true;
         go_PanelUI.SetActive(true); //미리보기가 등장하는 동안 슬롯창 끄기
